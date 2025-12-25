@@ -1,0 +1,26 @@
+# Use an official PHP CLI image as a base
+FROM php:8.2-cli-alpine
+
+# Install system dependencies
+RUN apk update && apk --no-cache add \
+    git \
+    curl-dev \
+    libzip-dev \
+    oniguruma-dev \
+    libxml2-dev \
+    build-base
+
+# Install the PHP cURL extension
+RUN docker-php-ext-install curl
+
+# Set the working directory
+WORKDIR /var/www/html
+
+# Copy your application code
+COPY . .
+
+# Expose port (PHP built-in server usually on port 8080)
+EXPOSE 8080
+
+# Command to start PHP built-in web server
+CMD ["php", "-S", "0.0.0.0:8080"]
