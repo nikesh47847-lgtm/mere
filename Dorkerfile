@@ -1,0 +1,35 @@
+# PHP-FPM base image
+FROM php:8.2-fpm-alpine
+
+# Install system dependencies
+RUN apk add --no-cache \
+    nginx \
+    curl-dev \
+    libzip-dev \
+    oniguruma-dev \
+    libxml2-dev \
+    supervisor
+
+# Install PHP extensions
+RUN docker-php-ext-install curl
+
+# Set working directory
+WORKDIR /var/www/html
+
+# Copy project files
+COPY . .
+
+# Copy Nginx config
+COPY nginx.conf /etc/nginx/nginx.conf
+
+# Copy Supervisor config
+COPY supervisord.conf /etc/supervisord.conf
+
+# Permissions
+RUN chown -R www-data:www-data /var/www/html
+
+# Expose port (Railway uses this)
+EXPOSE 8080
+
+# Start Nginx + PHP-FPM
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
